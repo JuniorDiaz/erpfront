@@ -1,4 +1,6 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
+import store from '@/store'
+import { TOKEN_NAME } from '@/config'
 
 import DashboardLayout from "../views/dashboard/layout/DashboardLayout.vue";
 import AuthLayout from "../views/dashboard/pages/AuthLayout.vue";
@@ -130,7 +132,7 @@ let formsMenu = {
   ],
 };
 
-// Tables Pages
+//Tables Pages
 import RegularTables from "../views/dashboard/tables/RegularTables.vue";
 import ExtendedTables from "../views/dashboard/tables/ExtendedTables.vue";
 import PaginatedTables from "../views/dashboard/tables/PaginatedTables.vue";
@@ -193,10 +195,10 @@ let mapsMenu = {
 };
 
 // Auth Pages
-import Pricing from "../views/dashboard/pages/Vnud-Pricing.vue";
-import Lock from "../views/dashboard/pages/Vnud-Lock.vue";
-import Register from "../views/dashboard/pages/Vnud-Register.vue";
-import Login from "../views/dashboard/pages/Vnud-Login.vue";
+import Lock from "../views/auth/Vnud-Lock.vue";
+import Login from "../views/auth/Vnud-Login.vue";
+import Register from "../views/auth/Vnud-Register.vue";
+
 
 let authPages = {
   path: "/",
@@ -204,20 +206,16 @@ let authPages = {
   name: "Authentication",
   children: [
     {
-      path: "/login",
-      name: "Login",
-      component: Login,
-    },
-    {
       path: "/register",
       name: "Register",
       component: Register,
     },
     {
-      path: "/pricing",
-      name: "Pricing",
-      component: Pricing,
+      path: "/login",
+      name: "login",
+      component: Login,
     },
+
     {
       path: "/lock",
       name: "Lock",
@@ -242,7 +240,102 @@ let clientePagina = {
     },
   ]
 };
+// Cargos pagina
+import Cargo from "../views/dashboard/cargos/RegistroCargo.vue";
 
+let cargoPagina = {
+  path: "/cargo",
+  component: DashboardLayout,
+  redirect: "/cargo/registro",
+  name: "cargo",
+  children: [
+    {
+      path: "registro",
+      name: "Cargo Registro",
+      components: { default: Cargo, header: DefaultHeader },
+    },
+  ]
+};
+// Perfil pagina
+import Perfil from "../views/dashboard/perfils/RegistroPerfil.vue";
+
+let perfilPagina = {
+  path: "/perfil",
+  component: DashboardLayout,
+  redirect: "/perfil/registro",
+  name: "perfil",
+  children: [
+    {
+      path: "registro",
+      name: "Perfil Registro",
+      components: { default: Perfil, header: DefaultHeader },
+    },
+  ]
+};
+// Categoria pagina
+import Categoria from "../views/dashboard/categorias/RegistroCategoria.vue";
+
+let categoriaPagina = {
+  path: "/categoria",
+  component: DashboardLayout,
+  redirect: "/categoria/registro",
+  name: "categoria",
+  children: [
+    {
+      path: "registro",
+      name: "Categoria Registro",
+      components: { default: Categoria, header: DefaultHeader },
+    },
+  ]
+};
+//Permissao pagina
+import Permissao from "../views/dashboard/permissoes/RegistroPermissao.vue";
+
+let permissaoPagina = {
+  path: "/permissao",
+  component: DashboardLayout,
+  redirect: "/permissao/registro",
+  name: "permissao",
+  children: [
+    {
+      path: "registro",
+      name: "Permissao Registro",
+      components: { default: Permissao, header: DefaultHeader },
+    },
+  ]
+};
+//Empresa pagina
+import Empresa from "../views/dashboard/empresas/RegistroEmpresa.vue";
+
+let empresaPagina = {
+  path: "/empresa",
+  component: DashboardLayout,
+  redirect: "/empresa/registro",
+  name: "empresa",
+  children: [
+    {
+      path: "registro",
+      name: "Empresa Registro",
+      components: { default: Empresa, header: DefaultHeader },
+    },
+  ]
+};
+//Usuario pagina
+import Usuario from "../views/dashboard/usuarios/RegistroUsuario.vue";
+
+let usuarioPagina = {
+  path: "/usuario",
+  component: DashboardLayout,
+  redirect: "/usuario/registro",
+  name: "usuario",
+  children: [
+    {
+      path: "registro",
+      name: "Usuario Registro",
+      components: { default: Usuario, header: DefaultHeader },
+    },
+  ]
+};
 const routes = [
   {
     path: "/",
@@ -250,6 +343,12 @@ const routes = [
     name: "Home",
   },
   clientePagina,
+  cargoPagina,
+  perfilPagina,
+  categoriaPagina,
+  permissaoPagina,
+  empresaPagina,
+  usuarioPagina,
   authPages,
   pagesMenu,
   componentsMenu,
@@ -283,14 +382,26 @@ const routes = [
         components: { default: Widgets, header: DefaultHeader },
       },
     ],
-  },
-  { path: "/:pathMatch(.*)*", component: NotFound },
+  }
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   linkActiveClass: "active",
   routes,
 });
+router.beforeEach(async (to, from, next) => {
+  const logado = store.state.usuarios.logado
+  const token = await localStorage.getItem(TOKEN_NAME)
+  if (!token && to.name != 'login') {
+    next('/login')
 
+  } else {
+    next();
+  }
+
+  // if (to.path !== '/login') {
+  //   next('/login');
+
+});
 export default router;
